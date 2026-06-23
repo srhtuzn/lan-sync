@@ -1,4 +1,7 @@
 @echo off
+for /d %%D in ("%~dp0.tools\node-v22.*-win-x64") do (
+    set "PATH=%%~fD;%PATH%"
+)
 chcp 65001 > nul
 title LAN Sync Başlatıcı
 

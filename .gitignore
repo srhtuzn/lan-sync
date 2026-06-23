@@ -1,4 +1,6 @@
 node_modules/
+.tools/
+logs/
 dist/
 *.db
 *.db-shm
