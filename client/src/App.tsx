@@ -34,20 +34,20 @@ export default function App(): JSX.Element {
         setSyncState(msg.state);
         break;
       case 'sync_started':
-        addHistory({ level: 'info', message: `Sync started with ${msg.peerId}` });
+        addHistory({ level: 'info', message: `${msg.peerId} ile eşitleme başladı` });
         break;
       case 'sync_complete':
-        addHistory({ level: 'success', message: `Synced ${msg.filesSynced} files in ${(msg.duration / 1000).toFixed(1)}s` });
+        addHistory({ level: 'success', message: `${msg.filesSynced} dosya ${(msg.duration / 1000).toFixed(1)} saniyede eşitlendi` });
         setProgress(null);
         break;
       case 'sync_error':
-        addHistory({ level: 'error', message: `Error: ${msg.file}`, detail: msg.error });
+        addHistory({ level: 'error', message: `Hata: ${msg.file}`, detail: msg.error });
         break;
       case 'sync_progress':
         setProgress({ file: msg.file, transferred: msg.transferred, total: msg.total, speed: msg.speed });
         break;
       case 'file_changed':
-        addHistory({ level: 'info', message: `${msg.action === 'added' ? 'Added' : 'Changed'}: ${msg.relativePath}` });
+        addHistory({ level: 'info', message: `${msg.action === 'added' ? 'Eklendi' : 'Değiştirildi'}: ${msg.relativePath}` });
         break;
     }
   }, [addHistory]);
@@ -59,7 +59,7 @@ export default function App(): JSX.Element {
       <header className={styles.header}>
         <span className={styles.logo}>&#8635; LAN Sync</span>
         <span className={styles.headerStatus} data-state={syncState}>
-          {syncState === 'idle' ? 'Idle' : syncState === 'syncing' ? 'Syncing…' : syncState === 'scanning' ? 'Scanning…' : 'Error'}
+          {syncState === 'idle' ? 'Boşta' : syncState === 'syncing' ? 'Eşitleniyor…' : syncState === 'scanning' ? 'Taranıyor…' : 'Hata'}
         </span>
       </header>
       <div className={styles.panels}>

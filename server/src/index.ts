@@ -14,6 +14,7 @@ import { configRoute } from './routes/config.js';
 import { eventsRoute } from './routes/events.js';
 import { scanRoute } from './routes/scan.js';
 import { syncRoute } from './routes/sync.js';
+import { peersRoute } from './routes/peers.js';
 
 const PORT = 37821;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -38,6 +39,7 @@ await fastify.register(configRoute);
 await fastify.register(eventsRoute);
 await fastify.register(scanRoute);
 await fastify.register(syncRoute);
+await fastify.register(peersRoute);
 
 // Catch-all for SPA routing (serve index.html for non-API routes)
 fastify.setNotFoundHandler((request, reply) => {
@@ -49,7 +51,12 @@ fastify.setNotFoundHandler((request, reply) => {
 
 try {
   await fastify.listen({ port: PORT, host: '0.0.0.0' });
-  console.log(`LAN Sync running at http://localhost:${PORT}`);
+  const { getLocalIp } = await import('./state.js');
+  console.log(`\n===================================================`);
+  console.log(`LAN Sync yerel ağda başarıyla başlatıldı!`);
+  console.log(`- Bu bilgisayardan erişim: http://localhost:${PORT}`);
+  console.log(`- Diğer bilgisayarlardan erişim: http://${getLocalIp()}:${PORT}`);
+  console.log(`===================================================\n`);
 } catch (err) {
   fastify.log.error(err);
   process.exit(1);

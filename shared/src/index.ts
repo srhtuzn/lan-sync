@@ -30,14 +30,34 @@ export interface DeviceStatus {
   version: string;
 }
 
-// Peer info stored in client
+// Peer info stored in client (UI state)
 export interface Peer {
-  id: string;             // uuid or "ip:port"
+  id: string;             // "ip:port"
   ip: string;
   port: number;
   status: DeviceStatus | null;
   reachable: boolean;
   lastSeen: number | null;
+}
+
+// Peer record persisted in server DB
+export interface StoredPeer {
+  id: string;             // "ip:port"
+  ip: string;
+  port: number;
+  autoSync: boolean;      // trigger sync automatically on file change
+  addedAt: number;        // Unix ms
+}
+
+// POST /api/peers body
+export interface AddPeerRequest {
+  ip: string;
+  port: number;
+}
+
+// PATCH /api/peers/:id body
+export interface UpdatePeerRequest {
+  autoSync: boolean;
 }
 
 // Analysis result (Analyze button)

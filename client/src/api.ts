@@ -1,4 +1,4 @@
-import type { DeviceStatus, FileIndex, SyncRunRequest, ScanResult, AnalysisResult } from '@lan-sync/shared';
+import type { DeviceStatus, FileIndex, SyncRunRequest, ScanResult, AnalysisResult, StoredPeer, AddPeerRequest } from '@lan-sync/shared';
 
 const BASE = '';
 
@@ -73,4 +73,36 @@ export function analyzeIndexes(local: FileIndex, remote: FileIndex): AnalysisRes
     missingOnRemote,
     conflicting,
   };
+}
+
+// ── Peer CRUD ─────────────────────────────────────────────────────────────────
+
+export async function getPeers(): Promise<(StoredPeer & { status: DeviceStatus | null; reachable: boolean })[]> {
+  const res = await fetch(`${BASE}/api/peers`);
+  if (!res.ok) throw new Error(`peers ${res.status}`);
+  return res.json();
+}
+
+export async function addPeer(req: AddPeerRequest): Promise<StoredPeer & { status: DeviceStatus | null; reachable: boolean }> {
+  const res = await fetch(`${BASE}/api/peers`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+  if (!res.ok) throw new Error(`addPeer ${res.status}`);
+  return res.json();
+}
+
+export async function removePeer(id: string): Promise<void> {
+  const res = await fetch(`${BASE}/api/peers/${encodeURIComponent(id)}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error(`removePeer ${res.status}`);
+}
+
+export async function toggleAutoSync(id: string, autoSync: boolean): Promise<void> {
+  const res = await fetch(`${BASE}/api/peers/${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ autoSync }),
+  });
+  if (!res.ok) throw new Error(`toggleAutoSync ${res.status}`);
 }

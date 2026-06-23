@@ -20,10 +20,10 @@ function formatBytes(n: number): string {
 }
 
 const STATE_LABELS: Record<SyncState, string> = {
-  idle: 'Ready',
-  syncing: 'Syncing…',
-  scanning: 'Scanning…',
-  error: 'Error',
+  idle: 'Hazır',
+  syncing: 'Eşitleniyor…',
+  scanning: 'Taranıyor…',
+  error: 'Hata',
 };
 
 export default function CenterPanel({
@@ -47,10 +47,10 @@ export default function CenterPanel({
     if (!activePeer) return;
     try {
       await syncRun({ peerIp: activePeer.ip, peerPort: activePeer.port });
-      addHistory({ level: 'info', message: `Sync requested with ${activePeer.ip}` });
+      addHistory({ level: 'info', message: `${activePeer.ip} ile eşitleme istendi` });
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      addHistory({ level: 'error', message: 'Sync request failed', detail: msg });
+      addHistory({ level: 'error', message: 'Eşitleme isteği başarısız oldu', detail: msg });
     }
   };
 
@@ -65,16 +65,16 @@ export default function CenterPanel({
       const result = analyzeIndexes(local, remote);
       setAnalysisResult(result);
       setAnalysisOpen(true);
-      addHistory({ level: 'info', message: `Analysis complete — local: ${result.localCount}, remote: ${result.remoteCount}` });
+      addHistory({ level: 'info', message: `Analiz tamamlandı — Yerel: ${result.localCount}, Karşı Cihaz: ${result.remoteCount}` });
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      addHistory({ level: 'error', message: 'Analysis failed', detail: msg });
+      addHistory({ level: 'error', message: 'Analiz başarısız oldu', detail: msg });
     }
     setAnalysisLoading(false);
   };
 
   const handleAutoRename = (): void => {
-    pushToast('Feature coming soon');
+    pushToast('Bu özellik yakında eklenecek');
   };
 
   const isSyncing = syncState === 'syncing';
@@ -100,7 +100,7 @@ export default function CenterPanel({
         </div>
       ) : (
         <div className={styles.noPeer}>
-          Select a peer from the left panel to sync.
+          Eşitleme yapmak için sol panelden bir cihaz seçin.
         </div>
       )}
 
@@ -110,27 +110,27 @@ export default function CenterPanel({
           className={`${styles.btn} ${styles.btnPrimary}`}
           onClick={() => void handleSyncNow()}
           disabled={!activePeer || isSyncing}
-          title="Sync Now"
+          title="Şimdi Eşitle"
         >
           <RefreshCw size={13} />
-          Sync Now
+          Şimdi Eşitle
         </button>
         <button
           className={`${styles.btn} ${styles.btnDefault}`}
           onClick={() => void handleAnalyze()}
           disabled={!activePeer || analysisLoading}
-          title="Analyze"
+          title="Analiz Et"
         >
           <Search size={13} />
-          {analysisLoading ? 'Analyzing…' : 'Analyze'}
+          {analysisLoading ? 'Analiz Ediliyor…' : 'Analiz Et'}
         </button>
         <button
           className={`${styles.btn} ${styles.btnDefault}`}
           onClick={handleAutoRename}
-          title="Auto-rename"
+          title="Otomatik Yeniden Adlandır"
         >
           <Wand2 size={13} />
-          Auto-rename
+          Otomatik Yeniden Adlandır
         </button>
       </div>
 
@@ -153,23 +153,23 @@ export default function CenterPanel({
       {analysisResult !== null && (
         <div className={styles.analysisSection}>
           <div className={styles.analysisHeader} onClick={() => setAnalysisOpen(o => !o)}>
-            <span className={styles.analysisTitle}>Analysis Result</span>
-            <button className={styles.analysisToggle}>{analysisOpen ? '▲ Hide' : '▼ Show'}</button>
+            <span className={styles.analysisTitle}>Analiz Sonuçları</span>
+            <button className={styles.analysisToggle}>{analysisOpen ? '▲ Gizle' : '▼ Göster'}</button>
           </div>
           {analysisOpen && (
             <div className={styles.analysisBody}>
               <div className={styles.analysisSummary}>
-                Local: {analysisResult.localCount} files ({formatBytes(analysisResult.localSize)})
+                Yerel: {analysisResult.localCount} dosya ({formatBytes(analysisResult.localSize)})
                 &nbsp;·&nbsp;
-                Remote: {analysisResult.remoteCount} files ({formatBytes(analysisResult.remoteSize)})
+                Karşı Cihaz: {analysisResult.remoteCount} dosya ({formatBytes(analysisResult.remoteSize)})
               </div>
 
               <div className={styles.analysisGroup}>
                 <div className={styles.analysisGroupTitle}>
-                  Missing on this PC ({analysisResult.missingOnLocal.length})
+                  Bu Bilgisayarda Eksik Olanlar ({analysisResult.missingOnLocal.length})
                 </div>
                 {analysisResult.missingOnLocal.length === 0
-                  ? <div className={styles.analysisEmpty}>None</div>
+                  ? <div className={styles.analysisEmpty}>Yok</div>
                   : analysisResult.missingOnLocal.map(f => (
                     <div key={f.relativePath} className={styles.analysisItem}>{f.relativePath}</div>
                   ))
@@ -178,10 +178,10 @@ export default function CenterPanel({
 
               <div className={styles.analysisGroup}>
                 <div className={styles.analysisGroupTitle}>
-                  Missing on peer ({analysisResult.missingOnRemote.length})
+                  Karşı Cihazda Eksik Olanlar ({analysisResult.missingOnRemote.length})
                 </div>
                 {analysisResult.missingOnRemote.length === 0
-                  ? <div className={styles.analysisEmpty}>None</div>
+                  ? <div className={styles.analysisEmpty}>Yok</div>
                   : analysisResult.missingOnRemote.map(f => (
                     <div key={f.relativePath} className={styles.analysisItem}>{f.relativePath}</div>
                   ))
@@ -190,10 +190,10 @@ export default function CenterPanel({
 
               <div className={styles.analysisGroup}>
                 <div className={styles.analysisGroupTitle}>
-                  Conflicts ({analysisResult.conflicting.length})
+                  Çakışan Dosyalar ({analysisResult.conflicting.length})
                 </div>
                 {analysisResult.conflicting.length === 0
-                  ? <div className={styles.analysisEmpty}>None</div>
+                  ? <div className={styles.analysisEmpty}>Yok</div>
                   : analysisResult.conflicting.map(({ local, remote }) => (
                     <div key={local.relativePath} className={styles.analysisItem}>
                       {local.relativePath}

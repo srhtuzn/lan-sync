@@ -28,12 +28,12 @@ export default function RightPanel({ history, onClear }: RightPanelProps): JSX.E
   return (
     <div className={styles.panel}>
       <div className={styles.header}>
-        <span className={styles.label}>History</span>
-        <button className={styles.clearBtn} onClick={onClear}>Clear</button>
+        <span className={styles.label}>İşlem Geçmişi</span>
+        <button className={styles.clearBtn} onClick={onClear}>Temizle</button>
       </div>
       <div className={styles.list}>
         {history.length === 0 ? (
-          <div className={styles.empty}>No activity yet</div>
+          <div className={styles.empty}>Henüz bir işlem gerçekleşmedi</div>
         ) : (
           history.map(entry => (
             <div key={entry.id} className={styles.entry}>

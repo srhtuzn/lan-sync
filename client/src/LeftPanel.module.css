@@ -275,3 +275,51 @@
 .removeBtn:hover {
   color: #f85149;
 }
+
+/* ── Oto-Eşitleme toggle butonu ── */
+.autoSyncBtn {
+  background: transparent;
+  border: none;
+  color: #8b949e;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 3px;
+  opacity: 0;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.1s, color 0.1s, background 0.1s;
+}
+
+.peerRow:hover .autoSyncBtn {
+  opacity: 1;
+}
+
+.autoSyncBtn.autoSyncOn {
+  opacity: 1;
+  color: #f0b429;
+  background: rgba(240, 180, 41, 0.12);
+}
+
+.autoSyncBtn.autoSyncOn:hover {
+  color: #f85149;
+  background: rgba(248, 81, 73, 0.12);
+}
+
+.autoSyncBtn:not(.autoSyncOn):hover {
+  color: #f0b429;
+  background: rgba(240, 180, 41, 0.12);
+}
+
+/* ── Oto-Eşitleme aktif notu ── */
+.autoSyncNote {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  padding: 8px 12px;
+  font-size: 10px;
+  color: #f0b429;
+  background: rgba(240, 180, 41, 0.07);
+  border-top: 1px solid rgba(240, 180, 41, 0.2);
+  flex-shrink: 0;
+}
