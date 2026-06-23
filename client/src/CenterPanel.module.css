@@ -1,0 +1,51 @@
+/* Status banner */
+.statusBanner { padding: 10px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 13px; font-weight: 500; transition: background 0.3s; }
+.statusBanner[data-state="idle"] { background: #21262d; color: #8b949e; }
+.statusBanner[data-state="syncing"] { background: #1c2b45; color: #388bfd; }
+.statusBanner[data-state="scanning"] { background: #2e2416; color: #d29922; }
+.statusBanner[data-state="error"] { background: #3d1c1c; color: #f85149; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+.statusBanner[data-state="syncing"] { animation: pulse 1.4s ease-in-out infinite; }
+
+/* Peer info */
+.noPeer { color: #8b949e; font-size: 13px; text-align: center; padding: 24px 0; }
+.peerInfo { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 12px; margin-bottom: 16px; font-size: 13px; }
+.peerInfoName { font-weight: 600; color: #e6edf3; }
+.peerInfoDetail { color: #8b949e; font-size: 12px; margin-top: 2px; }
+
+/* Buttons */
+.btnRow { display: flex; gap: 8px; margin-bottom: 16px; }
+.btn { display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 6px; font-size: 13px; cursor: pointer; border: none; font-weight: 500; }
+.btnPrimary { background: #238636; color: #fff; }
+.btnPrimary:hover:not(:disabled) { background: #2ea043; }
+.btnPrimary:disabled { opacity: 0.4; cursor: not-allowed; }
+.btnDefault { background: #21262d; color: #e6edf3; border: 1px solid #30363d; }
+.btnDefault:hover:not(:disabled) { background: #30363d; }
+.btnDefault:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Progress */
+.progressSection { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 12px; margin-bottom: 16px; }
+.progressFile { font-size: 12px; color: #8b949e; font-family: monospace; margin-bottom: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.progressBar { height: 6px; background: #30363d; border-radius: 3px; overflow: hidden; margin-bottom: 6px; }
+.progressFill { height: 100%; background: #388bfd; transition: width 0.2s; border-radius: 3px; }
+.progressStats { font-size: 11px; color: #8b949e; }
+
+/* Analysis */
+.analysisSection { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 12px; }
+.analysisHeader { display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
+.analysisTitle { font-size: 13px; font-weight: 600; color: #e6edf3; margin-bottom: 0; }
+.analysisToggle { font-size: 11px; color: #8b949e; background: none; border: none; cursor: pointer; padding: 0; }
+.analysisBody { margin-top: 8px; }
+.analysisSummary { font-size: 12px; color: #8b949e; margin-bottom: 12px; }
+.analysisGroup { margin-bottom: 10px; }
+.analysisGroupTitle { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #8b949e; margin-bottom: 4px; }
+.analysisItem { font-size: 12px; font-family: monospace; color: #e6edf3; padding: 2px 0; }
+.analysisEmpty { font-size: 12px; color: #3fb950; }
+
+/* Toast */
+.toastContainer { position: fixed; bottom: 20px; right: 20px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+.toast { background: #21262d; border: 1px solid #30363d; border-radius: 6px; padding: 10px 16px; font-size: 13px; color: #e6edf3; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }

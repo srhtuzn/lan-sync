@@ -1,0 +1,29 @@
+{
+  "name": "@lan-sync/server",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "vitest run --config vitest.config.ts"
+  },
+  "dependencies": {
+    "@lan-sync/shared": "*",
+    "@fastify/multipart": "^8.3.0",
+    "@fastify/static": "^7.0.4",
+    "@fastify/websocket": "^10.0.1",
+    "better-sqlite3": "^11.3.0",
+    "chokidar": "^3.6.0",
+    "fastify": "^4.27.0",
+    "ip": "^2.0.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/ip": "^1.1.3",
+    "@types/node": "^20.12.7",
+    "tsx": "^4.9.3",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  }
+}

@@ -1,0 +1,56 @@
+import Fastify from 'fastify';
+import fastifyWebsocket from '@fastify/websocket';
+import fastifyMultipart from '@fastify/multipart';
+import fastifyStatic from '@fastify/static';
+import path from 'node:path';
+import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import './db.js';
+
+import { statusRoute } from './routes/status.js';
+import { indexRoute } from './routes/index.js';
+import { filesRoute } from './routes/files.js';
+import { configRoute } from './routes/config.js';
+import { eventsRoute } from './routes/events.js';
+import { scanRoute } from './routes/scan.js';
+import { syncRoute } from './routes/sync.js';
+
+const PORT = 37821;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Detect if running from compiled dist or via tsx
+const publicDir = path.resolve(__dirname, '..', 'public');
+
+const fastify = Fastify({ logger: true });
+
+await fastify.register(fastifyWebsocket);
+await fastify.register(fastifyMultipart);
+
+// Serve built client static files if directory exists
+if (fs.existsSync(publicDir)) {
+  await fastify.register(fastifyStatic, { root: publicDir, prefix: '/' });
+}
+
+await fastify.register(statusRoute);
+await fastify.register(indexRoute);
+await fastify.register(filesRoute);
+await fastify.register(configRoute);
+await fastify.register(eventsRoute);
+await fastify.register(scanRoute);
+await fastify.register(syncRoute);
+
+// Catch-all for SPA routing (serve index.html for non-API routes)
+fastify.setNotFoundHandler((request, reply) => {
+  if (!request.url.startsWith('/api') && fs.existsSync(path.join(publicDir, 'index.html'))) {
+    return reply.sendFile('index.html');
+  }
+  reply.code(404).send({ error: 'Not found' });
+});
+
+try {
+  await fastify.listen({ port: PORT, host: '0.0.0.0' });
+  console.log(`LAN Sync running at http://localhost:${PORT}`);
+} catch (err) {
+  fastify.log.error(err);
+  process.exit(1);
+}
