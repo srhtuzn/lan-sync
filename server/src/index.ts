@@ -5,7 +5,10 @@ import fastifyStatic from '@fastify/static';
 import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import './db.js';
+import { getSetting } from './db.js';
+import { setRootDir } from './state.js';
+import { scanDirectory } from './fileIndexer.js';
+import { startWatcher } from './watcher.js';
 
 import { statusRoute } from './routes/status.js';
 import { indexRoute } from './routes/index.js';
@@ -40,6 +43,13 @@ await fastify.register(eventsRoute);
 await fastify.register(scanRoute);
 await fastify.register(syncRoute);
 await fastify.register(peersRoute);
+
+const savedRootDir = getSetting('rootDir');
+if (savedRootDir && fs.existsSync(savedRootDir) && fs.statSync(savedRootDir).isDirectory()) {
+  setRootDir(savedRootDir);
+  await scanDirectory(savedRootDir);
+  startWatcher(savedRootDir);
+}
 
 // Catch-all for SPA routing (serve index.html for non-API routes)
 fastify.setNotFoundHandler((request, reply) => {

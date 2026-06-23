@@ -31,6 +31,11 @@ db.exec(`
     auto_sync  INTEGER NOT NULL DEFAULT 0,
     added_at   INTEGER NOT NULL
   );
+
+  CREATE TABLE IF NOT EXISTS settings (
+    key   TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+  );
 `);
 
 const fileColumns = db.prepare('PRAGMA table_info(files)').all() as Array<{ name: string }>;
@@ -68,6 +73,19 @@ export function deleteFile(relativePath: string): void {
 
 export function clearAllFiles(): void {
   db.prepare('DELETE FROM files').run();
+}
+
+export function getSetting(key: string): string | null {
+  const row = db.prepare('SELECT value FROM settings WHERE key = ?').get(key) as { value: string } | undefined;
+  return row?.value ?? null;
+}
+
+export function setSetting(key: string, value: string): void {
+  db.prepare(`
+    INSERT INTO settings (key, value)
+    VALUES (?, ?)
+    ON CONFLICT(key) DO UPDATE SET value = excluded.value
+  `).run(key, value);
 }
 
 // ── Peer CRUD ──────────────────────────────────────────────────────────────
