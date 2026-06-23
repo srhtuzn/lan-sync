@@ -1,5 +1,5 @@
 import chokidar from 'chokidar';
-import { indexFile } from './fileIndexer.js';
+import { indexDirectory, indexFile } from './fileIndexer.js';
 import { deleteFile } from './db.js';
 import { getAutoSyncPeers } from './db.js';
 import { toRelative } from './pathGuard.js';
@@ -67,6 +67,18 @@ export function startWatcher(root: string): void {
     });
   });
 
+  watcher.on('addDir', (dirPath) => {
+    debounce(dirPath, async () => {
+      try {
+        if (dirPath === root) return;
+        await indexDirectory(root, dirPath);
+        const relativePath = toRelative(root, dirPath);
+        broadcast({ type: 'file_changed', relativePath, action: 'added' });
+        schedulePeerNotify();
+      } catch { /* skip locked/unreadable dirs */ }
+    });
+  });
+
   watcher.on('change', (filePath) => {
     debounce(filePath, async () => {
       try {
@@ -81,6 +93,13 @@ export function startWatcher(root: string): void {
   watcher.on('unlink', (filePath) => {
     try {
       const relativePath = toRelative(root, filePath);
+      deleteFile(relativePath);
+    } catch { /* ignore */ }
+  });
+
+  watcher.on('unlinkDir', (dirPath) => {
+    try {
+      const relativePath = toRelative(root, dirPath);
       deleteFile(relativePath);
     } catch { /* ignore */ }
   });

@@ -5,6 +5,7 @@ import { getAllFiles } from './db.js';
 import { broadcast } from './wsClients.js';
 import { setSyncState, syncState } from './state.js';
 import { indexFile } from './fileIndexer.js';
+import { indexDirectory } from './fileIndexer.js';
 import { compareIndexes } from './compareIndexes.js';
 import { makeConflictName } from './conflictName.js';
 
@@ -29,10 +30,21 @@ export async function syncFromPeer(peerIp: string, peerPort: number, localRoot: 
 
     for (const peerFile of toDownload) {
       const localFile = localFiles.get(peerFile.relativePath);
-      const isConflict = localFile && localFile.sha256 !== peerFile.sha256;
+      const isConflict = localFile?.kind === 'file' && peerFile.kind === 'file' && localFile.sha256 !== peerFile.sha256;
       let tmpPath: string | null = null;
 
       try {
+        if (peerFile.kind === 'directory') {
+          const destAbsolute = path.join(localRoot, peerFile.relativePath);
+          if (fs.existsSync(destAbsolute) && !fs.statSync(destAbsolute).isDirectory()) {
+            throw new Error('A file already exists at this folder path');
+          }
+          fs.mkdirSync(destAbsolute, { recursive: true });
+          await indexDirectory(localRoot, destAbsolute);
+          synced++;
+          continue;
+        }
+
         broadcast({
           type: 'sync_progress',
           peerId: `${peerIp}:${peerPort}`,

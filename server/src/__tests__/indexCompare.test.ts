@@ -3,7 +3,11 @@ import { compareIndexes } from '../compareIndexes.js';
 import type { FileMetadata } from '@lan-sync/shared';
 
 function makeFile(relativePath: string, sha256: string, size = 100): FileMetadata {
-  return { relativePath, size, mtime: Date.now(), sha256, indexedAt: Date.now() };
+  return { relativePath, kind: 'file', size, mtime: Date.now(), sha256, indexedAt: Date.now() };
+}
+
+function makeDirectory(relativePath: string): FileMetadata {
+  return { relativePath, kind: 'directory', size: 0, mtime: Date.now(), sha256: '__directory__', indexedAt: Date.now() };
 }
 
 describe('compareIndexes', () => {
@@ -18,6 +22,14 @@ describe('compareIndexes', () => {
     const { toDownload } = compareIndexes([], [remote]);
     expect(toDownload).toHaveLength(1);
     expect(toDownload[0].relativePath).toBe('new.txt');
+  });
+
+  it('detects directory missing on local', () => {
+    const remote = makeDirectory('empty-folder');
+    const { toDownload } = compareIndexes([], [remote]);
+    expect(toDownload).toHaveLength(1);
+    expect(toDownload[0].kind).toBe('directory');
+    expect(toDownload[0].relativePath).toBe('empty-folder');
   });
 
   it('detects file with different sha256 (conflict)', () => {

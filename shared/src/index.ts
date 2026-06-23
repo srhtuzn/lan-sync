@@ -3,6 +3,7 @@ export const VERSION = '1.0.0';
 // File metadata stored in DB and exchanged between peers
 export interface FileMetadata {
   relativePath: string;   // normalized with forward slashes, no leading slash
+  kind: 'file' | 'directory';
   size: number;           // bytes
   mtime: number;          // Unix timestamp ms
   sha256: string;         // hex string

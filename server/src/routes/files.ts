@@ -24,6 +24,7 @@ export const filesRoute: FastifyPluginAsync = async (fastify) => {
     if (!fs.existsSync(absolutePath)) return reply.code(404).send({ error: 'File not found' });
 
     const stat = fs.statSync(absolutePath);
+    if (!stat.isFile()) return reply.code(400).send({ error: 'Path is not a file' });
     reply.header('Content-Length', stat.size);
     reply.header('Content-Type', 'application/octet-stream');
     reply.header('X-File-Path', relativePath);

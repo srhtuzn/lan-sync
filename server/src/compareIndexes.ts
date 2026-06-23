@@ -11,7 +11,7 @@ export function compareIndexes(
   const localMap = new Map(localFiles.map(f => [f.relativePath, f]));
   const toDownload = remoteFiles.filter(peerFile => {
     const local = localMap.get(peerFile.relativePath);
-    return !local || local.sha256 !== peerFile.sha256;
+    return !local || local.kind !== peerFile.kind || local.sha256 !== peerFile.sha256;
   });
   return { toDownload };
 }

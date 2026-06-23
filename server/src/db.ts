@@ -17,6 +17,7 @@ db.pragma('synchronous = NORMAL');
 db.exec(`
   CREATE TABLE IF NOT EXISTS files (
     relative_path TEXT PRIMARY KEY,
+    kind          TEXT NOT NULL DEFAULT 'file',
     size          INTEGER NOT NULL,
     mtime         INTEGER NOT NULL,
     sha256        TEXT NOT NULL,
@@ -32,9 +33,15 @@ db.exec(`
   );
 `);
 
+const fileColumns = db.prepare('PRAGMA table_info(files)').all() as Array<{ name: string }>;
+if (!fileColumns.some(column => column.name === 'kind')) {
+  db.exec(`ALTER TABLE files ADD COLUMN kind TEXT NOT NULL DEFAULT 'file'`);
+}
+
 export function getAllFiles(): import('@lan-sync/shared').FileMetadata[] {
-  return db.prepare('SELECT relative_path, size, mtime, sha256, indexed_at FROM files').all().map((row: any) => ({
+  return db.prepare('SELECT relative_path, kind, size, mtime, sha256, indexed_at FROM files').all().map((row: any) => ({
     relativePath: row.relative_path,
+    kind: row.kind ?? 'file',
     size: row.size,
     mtime: row.mtime,
     sha256: row.sha256,
@@ -44,14 +51,15 @@ export function getAllFiles(): import('@lan-sync/shared').FileMetadata[] {
 
 export function upsertFile(meta: import('@lan-sync/shared').FileMetadata): void {
   db.prepare(`
-    INSERT INTO files (relative_path, size, mtime, sha256, indexed_at)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO files (relative_path, kind, size, mtime, sha256, indexed_at)
+    VALUES (?, ?, ?, ?, ?, ?)
     ON CONFLICT(relative_path) DO UPDATE SET
+      kind = excluded.kind,
       size = excluded.size,
       mtime = excluded.mtime,
       sha256 = excluded.sha256,
       indexed_at = excluded.indexed_at
-  `).run(meta.relativePath, meta.size, meta.mtime, meta.sha256, meta.indexedAt);
+  `).run(meta.relativePath, meta.kind, meta.size, meta.mtime, meta.sha256, meta.indexedAt);
 }
 
 export function deleteFile(relativePath: string): void {
